@@ -1,0 +1,207 @@
+
+<?xml-model href="file.dtd" type="application/xml-dtd"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resume.init.Mapper.DetailMapper">
+
+    <resultMap id="DetailResult"  type="Personal_info">
+
+        <result property="info_id"      column="info_id"/>
+        <result property="name"         column="name"/>
+        <result property="phone"        column="phone"/>
+        <result property="email"        column="email"/>
+        <result property="birth"        column="birth"/>
+        <result property="career_age"   column="career_age"/>
+        <result property="area"         column="area"/>
+        <result property="photo"        column="photo"/>
+        <result property="resume"       column="resume"/>
+
+    </resultMap>
+    
+    <select id="getDetail"  parameterType="Integer"   resultType="com.resume.init.domain.Personal_info" >
+      <![CDATA[
+      SELECT * 
+      FROM 
+          ( 
+            SELECT a.*, b.*, c.*, d.*, e.*, concat(c.career,'(',a.age,')') as career_age
+            FROM 
+              ( 
+                select p.id, p.name, p.phone, p.email, p.birth, extract(year from age(now()::date, p.birth)) as age, p.del_yn
+                from resume.resume_personal_info p
+                group by p.id
+              )a 
+                left outer join 
+              (
+                select p.id as qid, ARRAY_TO_STRING(ARRAY_AGG(qc.qualifi_name),',') as qualifi
+                from resume.resume_qualifications q, resume.resume_personal_info p, resume.resume_qualification_code qc
+                where q.info_id  = p.id and qc.qualifi_mc = q.qualifi_mc 	
+                group by p.id
+              ) b on a.id = b.qid
+              left outer join  
+              (
+                select p.id as cid, concat((greatest(max(c.end_date) ,max(w.end_date)) - least(min(c.start_date) , min(w.start_date)))/365, '년',(greatest(max(c.end_date) ,max(w.end_date)) - least(min(c.start_date) , min(w.start_date)))%365/30 ,'개월') as career
+                from resume.resume_personal_info p left outer join ( resume.resume_work_expertentce w left outer join resume.resume_career_detail c  on c.info_id = w.info_id ) on p.id in (w.info_id, c.info_id)
+                group by p.id
+              )c on b.qid = c.cid
+              left outer join  
+              (
+                select wa.info_id as waid, ARRAY_TO_STRING(ARRAY_AGG(ra.name),',') as area
+                from resume.resume_work_area wa, resume.resume_area ra
+                where wa.area_yn = 'Y' and wa.area_id = ra.id 
+                group by wa.info_id
+              )d on c.cid = d.waid
+              left outer join 
+              (
+                select p.id as iid, i.imgname
+                from resume.resume_personal_info p , resume.resume_img i
+                where p.id = i.info_id 
+                group by p.id, i.imgname 
+              )e on d.waid = e.iid
+          )A  
+          WHERE  del_yn = 'N' and id = #{info_id} 
+      ]]>
+    </select>
+
+<!-- 아이디로 파일 조회 -->
+    <select id="fileDetail" parameterType="Integer" resultType="com.resume.init.domain.FileAttach">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_file 
+        WHERE info_id = #{info_id}
+      ]]>
+    </select>
+<!-- 증명사진 조회 -->
+    <select id="imgSelect" parameterType="Integer" resultType="com.resume.init.domain.ImageAttach">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_img 
+        WHERE info_id = #{info_id}
+      ]]>
+  </select>
+
+  <!-- 파일 아이디로 조회 -->
+    <select id="fileSelect" parameterType="Integer" resultType="com.resume.init.domain.FileAttach">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_file 
+        WHERE id = #{file_id}
+      ]]>
+    </select>
+<!-- 지역 목록 조회 -->
+    <select id="areaSelect" parameterType="Integer" resultType="com.resume.init.domain.Area">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_area
+        order by id
+      ]]>
+    </select>
+<!-- 지역 가능여부 조회 -->
+    <select id="workAreaYNSelect" parameterType="Integer" resultType="com.resume.init.domain.WorkArea">
+      <![CDATA[
+        select wa.area_yn 
+        from resume.resume_work_area wa, resume.resume_area ra
+        where  wa.area_id = ra.id  and wa.info_id = ${id}
+        order by wa.area_id 
+      ]]>
+    </select>
+
+    <select id="workAreaSelect" parameterType="Integer" resultType="com.resume.init.domain.WorkArea">
+      <![CDATA[
+        select *
+        from resume.resume_work_area wa, resume.resume_area ra
+        where  wa.area_id = ra.id  and wa.info_id = ${id}
+        order by wa.area_id 
+      ]]>
+    </select>
+<!-- 직종 조회 -->
+    <select id="occupationSelect" parameterType="Integer" resultType="com.resume.init.domain.Occupation">
+      <![CDATA[
+      select * 
+      from resume.resume_occupation 
+      ]]>
+    </select>
+<!-- 직무 조회 -->
+    <select id="taskSelect" parameterType="Integer" resultType="com.resume.init.domain.Task">
+      <![CDATA[
+      select *
+      from resume.resume_task 
+      ]]>
+    </select>
+<!-- 고객사 조회 -->
+    <select id="clientSelect" parameterType="Integer" resultType="com.resume.init.domain.Client">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_client
+      ]]>
+    </select>
+<!-- 학원 조회 -->
+    <select id="instituteSelect" parameterType="Integer" resultType="com.resume.init.domain.Institute">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_institute 
+      ]]>
+    </select>
+<!-- 직위 조회 -->
+    <select id="spotSelect" parameterType="Integer" resultType="com.resume.init.domain.Spot">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_spot
+      ]]>
+  </select>
+<!-- 근무경력 조회 -->
+    <select id="workSelect" parameterType="Integer" resultType="com.resume.init.domain.Work">
+      <![CDATA[
+        SELECT w.start_date, w.end_date, w.company_name, w.department, t.name as task, s.name as spot 
+        FROM resume.resume_work_expertentce w, resume.resume_task t, resume.resume_spot s
+        WHERE w.info_id = #{info_id} and w.task_mc = t.task_mc and s.spot_mc = w.spot_mc
+      ]]>
+    </select>
+<!-- 기술경력 조회 -->
+    <select id="careerSelect" parameterType="Integer" resultType="com.resume.init.domain.Career">
+      <![CDATA[
+        SELECT cd.project_name, cd.start_date, cd.end_date, cd.task_detail, cl.name as client_name, t.name as task
+        FROM resume.resume_career_detail cd, resume.resume_client cl, resume.resume_task t
+        WHERE cd.info_id = #{info_id} AND cl.client_mc = cd.client_mc AND t.task_mc = cd.task_mc ORDER BY cd.start_date
+      ]]>
+    </select>
+<!-- 자격증 조회 -->
+    <select id="qualifiSelect" parameterType="Integer" resultType="com.resume.init.domain.Qualifications">
+      <![CDATA[
+        SELECT q.id, q.info_id, qc.qualifi_name as name, qc.issuer, q.reg_num , q.reg_date 
+        FROM resume.resume_qualifications q, resume.resume_qualification_code qc
+        WHERE q.info_id = #{info_id} and qc.qualifi_mc = q.qualifi_mc 
+      ]]>
+    </select>
+<!-- 학력사항 조회 -->
+    <select id="educationSelect" parameterType="Integer" resultType="com.resume.init.domain.Education">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_education 
+        WHERE info_id = #{info_id}
+      ]]>
+    </select>
+<!-- 교육사항 조회 -->
+    <select id="eduMatterSelect" parameterType="Integer" resultType="com.resume.init.domain.EduMatter">
+      <![CDATA[
+        SELECT e.course_name, e.start_date, e.end_date,  i.name as institation, e.completion_number
+        FROM resume.resume_educational_matter e, resume.resume_institute i
+        WHERE e.info_id = #{info_id} AND e.institute_mc = i.institute_mc
+      ]]>
+    </select>
+<!-- 상훈 조회 -->
+    <select id="prizeSelect" parameterType="Integer" resultType="com.resume.init.domain.Prize">
+      <![CDATA[
+        SELECT * 
+        FROM resume.resume_prize 
+        WHERE info_id = #{info_id} 
+      ]]>
+    </select>
+<!-- 자격증 코드 조회 -->
+    <select id="qualification_codeSelect" parameterType="Integer" resultType="com.resume.init.domain.Qualification_code">
+      <![CDATA[
+        SELECT *
+        FROM resume.resume_qualification_code qc
+      ]]>
+    </select>
+</mapper>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <script src="/js/detail.js" type="text/javascript"></script>
+</head>
+<body>
+<div th:fragment="detail">
+    <ul class="nav nav-pills m-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-info-tab" data-bs-toggle="pill" data-bs-target="#pills-info" type="button" role="tab" aria-controls="pills-info" aria-selected="true">인적사항</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-work-tab" data-bs-toggle="pill" data-bs-target="#pills-work" type="button" role="tab" aria-controls="pills-work" aria-selected="false">근무경력</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-career-tab" data-bs-toggle="pill" data-bs-target="#pills-career" type="button" role="tab" aria-controls="pills-career" aria-selected="false">기술경력</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-education-tab" data-bs-toggle="pill" data-bs-target="#pills-education" type="button" role="tab" aria-controls="pills-education" aria-selected="false">학력사항</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-edumatter-tab" data-bs-toggle="pill" data-bs-target="#pills-edumatter" type="button" role="tab" aria-controls="pills-edumatter" aria-selected="false">교육사항</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-qualifications-tab" data-bs-toggle="pill" data-bs-target="#pills-qualifications" type="button" role="tab" aria-controls="pills-qualifications" aria-selected="false">자격증</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-prize-tab" data-bs-toggle="pill" data-bs-target="#pills-prize" type="button" role="tab" aria-controls="pills-prize" aria-selected="false">상훈</button>
+        </li>
+    </ul>
+    <div class="tab-content m-3" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-info" role="tabpanel" aria-labelledby="pills-info-tab">
+            <form id="UpdateForm" name="UpdateForm" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="info_id"   name="info_id"          th:value="${detailset.id}">
+                <table class="detailTable" border="0">
+                    <colgroup>
+                        <col width="13%"/>
+                        <col width="27%"/>
+                        <col width="13%"/>
+                        <col width="27%"/>
+                        <col width="20%"/>
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <td>이름</td>
+                            <td><input type="text" class="form-control"  id="name"       name="name"     th:value="${detailset.name}"></td>
+                            <td>생년월일</td>
+                            <td><input type="text" class="form-control"  id="birth"      name="birth"    th:value="${detailset.birth}" onfocus="(this.type='date')" onblur="(this.type='text')"></td>
+                            <td rowspan="2" th:each="img : ${img}">
+                                <input type="hidden" name="photo" th:value="${img.imgname}">
+                                <img class="detail-info-img" th:src="@{|img/${img.imgname}|}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>휴대폰</td>
+                            <td><input type="text" class="form-control"  id="phone"      name="phone"    th:value="${detailset.phone}"></td>
+                            <td>이메일</td>
+                            <td><input type="text" class="form-control"  id="email"      name="email"    th:value="${detailset.email}"></td>
+                        </tr>   
+                        <tr>
+                            <td>주소</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>직종</td>
+                            <td>
+                                <select name="occupation" id="user_occupation" class="form-select">
+                                    <option value="">직종을 선택해주세요.</option>
+                                    <option th:each="occupation : ${occupation}" th:value="${occupation.occupation_nm}">[[${occupation.name}]]</option>
+                                </select>
+                            </td>
+                            <td>직무</td>
+                            <td>
+                                <select name="task" id="user_task" class="form-select" disabled>
+                                    <option value="">직무를 선택해주세요</option>
+                                    <option th:each="task : ${task}" th:value="${task.task_nm}">[[${task.name}]]</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>근무가능지역</td>
+                            <td colspan="3">
+                                <div class="form-check form-check-inline" th:each="area : ${area}" >
+                                        <input class="form-check-input" type="checkbox" th:id="|areaCheckbox${area.id}|" name="area" th:value="${area.id}"  th:if="${workarea[areaStat.index].area_yn} == Y" checked>
+                                        <input class="form-check-input" type="checkbox" th:id="|areaCheckbox${area.id}|" name="area" th:value="${area.id}"  th:unless="${workarea[areaStat.index].area_yn}  == Y">
+                                    <label class="form-check-label" th:for="|areaCheckbox${area.id}|">[[${area.name}]]</label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>사진</td>
+                            <td><input type="file" class="form-control" id="attachImg" name="attachImg"></td>
+                            <td>첨부파일</td>
+                            <td><input type="file" class="form-control" id="attachFile" name="attachFile"></td>
+                        </tr>
+                        <tr>
+                            
+                        </tr>
+                        <tr th:if="${file}" th:each="file : ${file}" th:id="|file_list${file.id}|">
+                            <td class="td-file" colspan="3">
+                                <a th:href="@{/fileDown/{id}(id=${file.id})}">[[${file.fileoriginname}]]</a>
+                                <button type="button" class="btn btn-danger m-2" th:id="|file-delete-btn${file.id}|" th:attr="onclick=|fileDelete('${file.id}')|">삭제</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="pills-work" role="tabpanel" aria-labelledby="pills-work-tab">
+            <table id="workList"></table>
+            <div id="workListPager"></div>
+        </div>
+        <div class="tab-pane fade" id="pills-career" role="tabpanel" aria-labelledby="pills-career-tab">
+            <table id="careerList"></table>
+            <div id="careerListPager"></div>
+        </div>
+        <div class="tab-pane fade" id="pills-education" role="tabpanel" aria-labelledby="pills-education-tab">
+            <table id="educationList"></table>
+            <div id="educationListPager"></div>
+        </div>
+        <div class="tab-pane fade" id="pills-edumatter" role="tabpanel" aria-labelledby="pills-edumatter-tab">
+            <table id="edumatterList"></table>
+            <div id="edumatterListPager"></div>
+        </div>
+        <div class="tab-pane fade" id="pills-qualifications" role="tabpanel" aria-labelledby="pills-qualifications-tab">
+            <table id="qualificationsList"></table>
+            <div id="qualificationsListPager"></div>
+        </div>
+        <div class="tab-pane fade" id="pills-prize" role="tabpanel" aria-labelledby="pills-prize-tab">
+            <table id="prizeList"></table>
+            <div id="prizeListPager"></div>
+        </div>
+    </div>  
+
+
+    <!-- 추가 모달 -->
+    <div class="modal fade" id="addDetials" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                        <!-- 근무경력 -->
+                        <form name="workForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable work">
+                                <colgroup>
+                                    <col width="15%"/>
+                                    <col width="75%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>회사명</td>
+                                        <td><input type="text" id="work_Company_Name" name="company_name" class="form-control work" placeholder="회사명"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>부서명</td>
+                                        <td><input type="text" id="work_Department" name="department" class="form-control work" placeholder="부서"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>입사일</td>
+                                        <td><input type="text" id="work_Start_date" name="start_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control work" placeholder="입사일"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>퇴사일</td>
+                                        <td><input type="text" id="work_End_date" name="end_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control work" placeholder="퇴사일"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>직위</td>
+                                        <td><select name="spot_mc" id="work_Spot" class ="form-select work">
+                                                <option value="">직위 선택</option>
+                                                <option th:each="spot : ${spot}" th:value="${spot.spot_mc}">[[${spot.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>업무</td>
+                                        <td>
+                                            <select name="task_mc" id="work_Task" class ="form-select work">
+                                                <option value="">업무 선택</option>
+                                                <option th:each="task : ${task}" th:value="${task.task_mc}">[[${task.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 기술경력 -->
+                        <form name="careerForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable career">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>사업명</td>
+                                        <td>
+                                            <input type="text" id="career_Project_name" name="project_name" class="form-control career" placeholder="사업명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>시작일</td>
+                                        <td>
+                                            <input type="text" id="career_Start_date" name="start_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control career" placeholder="시작일">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>종료일</td>
+                                        <td>
+                                            <input type="text" id="career_End_date" name="end_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control career" placeholder="종료일">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>고객사</td>
+                                        <td>
+                                            <select name="client_mc" id="career_Client_name" class ="form-select career">
+                                                <option value="">고객사 선택</option>
+                                                <option th:each="client : ${client}" th:value="${client.client_mc}">[[${client.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>업무</td>
+                                        <td>
+                                            <select name="task_mc" id="career_Task" class ="form-select career">
+                                                <option value="">업무 선택</option>
+                                                <option th:each="task : ${task}" th:value="${task.task_mc}">[[${task.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>상세업무</td>
+                                        <td>
+                                            <textarea id="career_Task_detail" name="task_detail" class="form-control career" placeholder="상세업무"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 학력사항 -->
+                        <form name="educationForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable education">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>학교명</td>
+                                        <td>
+                                            <input type="text" id="education_name" name="name" class="form-control education" placeholder="학교명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학과(전공)</td>
+                                        <td>
+                                            <input type="text" id="education_department" name="department" class="form-control education" placeholder="학과(전공)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학위</td>
+                                        <td>
+                                            <input type="text" id="education_degree" name="degree" class="form-control education" placeholder="학위">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>입학날짜</td>
+                                        <td>
+                                            <input type="text" id="education_start_date" name="start_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control education" placeholder="입학날짜">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>졸업날짜</td>
+                                        <td>
+                                            <input type="text" id="education_end_date" name="end_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control education" placeholder="졸업날짜">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 교육사항 -->
+                        <form name="edumatterForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable edumatter">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>과정명</td>
+                                        <td>
+                                            <input type="text" id="edumatter_course_name" name="course_name" class="form-control edumatter" placeholder="과정명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학원</td>
+                                        <td>
+                                            <select name="institute_mc" id="edumatter_institaion" class ="form-select edumatter">
+                                                <option value="">학원 선택</option>
+                                                <option th:each="institation : ${institute}" th:value="${institation.institute_mc}">[[${institation.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>수료번호</td>
+                                        <td>
+                                            <input type="text" id="edumatter_completion_number" name="completion_number" class="form-control edumatter" placeholder="수료번호">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>시작일</td>
+                                        <td>
+                                            <input type="text" id="edumatter_start_date" name="start_date"  onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control edumatter" placeholder="시작일">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>수료일</td>
+                                        <td>
+                                            <input type="text" id="edumatter_end_date" name="end_date"  onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control edumatter" placeholder="수료일">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 자격증 -->
+                        <form name="qualificationsForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable qualifications">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>자격증명</td>
+                                        <td>
+                                            <select name="qualifi_mc" id="qualifi_mc" class ="form-select qualifications">
+                                                <option value="">자격증 선택</option>
+                                                <option th:each="qualifi : ${qualifi}" th:value="${qualifi.qualifi_mc}">[[${qualifi.qualifi_name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>발급번호</td>
+                                        <td>
+                                            <input type="text" id="qualifi_reg_num" name="reg_num" class="form-control qualifications" placeholder="발급번호">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>취득일</td>
+                                        <td>
+                                            <input type="text"  id="qualfi_reg_date" name="reg_date" onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control qualifications" placeholder="취득일">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 상훈 -->
+                        <form name="prizeForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <table border="0" class="addTable prize">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>상훈명</td>
+                                        <td>
+                                            <input type="text" id="prize_name" name="name" class="form-control prize" placeholder="상훈명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>상훈기관</td>
+                                        <td>
+                                            <input type="text" id="prize_agency" name="agency" class="form-control prize" placeholder="상훈기관">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>근거</td>
+                                        <td>
+                                            <input type="text" id="prize_evidence" name="evidence" class="form-control prize" placeholder="근거">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>연 월 일</td>
+                                        <td>
+                                            <input type="text" id="prize_reg_date" name="reg_date" onfocus="(this.type='date')" onblur="(this.type='text')"class="form-control prize" placeholder="연 월 일">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="detail-save-btn">저장</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div class="modal fade" id="updateDetials" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                
+                    <div class="modal-body">
+                        <input type="hidden" id="info_id" name="info_id" th:value="${detailset.id}">
+                        <!-- 근무경력 -->
+                        <form name="workupdateForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <input type="hidden"    id="update_work_id"             name="id">
+                            <table border="0" class="addTable work">
+                                <colgroup>
+                                    <col width="15%"/>
+                                    <col width="75%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>회사명</td>
+                                        <td>
+                                            <input type="text"      id="update_work_Company_Name"   name="company_name" class="form-control work" placeholder="회사이름">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>부서명</td>
+                                        <td>
+                                            <input type="text"      id="update_work_Department"     name="department"   class="form-control work" placeholder="부서">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>입사일</td>
+                                        <td>
+                                            <input type="text"      id="update_work_Start_date"     name="start_date"   class="form-control work" placeholder="입사일" onfocus="(this.type='date')" onblur="(this.type='text')" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>퇴사일</td>
+                                        <td>
+                                            <input type="text"      id="update_work_End_date"       name="end_date"     class="form-control work" placeholder="퇴사일" onfocus="(this.type='date')" onblur="(this.type='text')" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>직위</td>
+                                        <td>
+                                            <select name="spot_mc"  id="update_work_Spot" class ="form-select work">
+                                                <option value="">직위 선택</option>
+                                                <option th:each="spot : ${spot}" th:value="${spot.spot_mc}">[[${spot.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>업무</td>
+                                        <td>
+                                            <select name="task_mc" id="update_work_Task" class ="form-select work">
+                                                <option value="">업무 선택</option>
+                                                <option th:each="task : ${task}" th:value="${task.task_mc}">[[${task.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 기술경력 -->
+                        <form name="careerupdateForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <input type="hidden"    id="update_career_id"           name="id" >
+                            <table border="0" class="addTable career">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>사업명</td>
+                                        <td>
+                                            <input type="text"      id="update_career_Project_name" name="project_name" class="form-control career" placeholder="사업명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>시작일</td>
+                                        <td>
+                                            <input type="text"      id="update_career_Start_date"   name="start_date"   class="form-control career" placeholder="시작일" onfocus="(this.type='date')" onblur="(this.type='text')">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>종료일</td>
+                                        <td>
+                                            <input type="text"      id="update_career_End_date"     name="end_date"     class="form-control career" placeholder="종료일" onfocus="(this.type='date')" onblur="(this.type='text')">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>고객사</td>
+                                        <td>
+                                            <select name="client_mc" id="update_career_Client_name" class ="form-select career">
+                                                <option value="">고객사 선택</option>
+                                                <option th:each="client : ${client}" th:value="${client.client_mc}">[[${client.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>업무</td>
+                                        <td>
+                                            <select name="task_mc" id="update_career_Task" class ="form-select career">
+                                                <option value="">업무 선택</option>
+                                                <option th:each="task : ${task}" th:value="${task.task_mc}">[[${task.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>상세업무</td>
+                                        <td>
+                                            <textarea id="update_career_Task_detail" name="task_detail" class="form-control career"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 학력사항 -->
+                        <form name="educationupdateForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <input type="hidden" id="update_edu_id"               name="id">
+                            <table border="0" class="addTable education">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>학교명</td>
+                                        <td>
+                                            <input type="text"   id="update_education_name"       name="name"       class="form-control education" placeholder="학교명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학과(전공)</td>
+                                        <td>
+                                            <input type="text"   id="update_education_department" name="department" class="form-control education" placeholder="학과(전공)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학위</td>
+                                        <td>
+                                            <input type="text"   id="update_education_degree"     name="degree"     class="form-control education" placeholder="학위">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>입학날짜</td>
+                                        <td>
+                                            <input type="text"   id="update_education_start_date" name="start_date" class="form-control education" placeholder="입학날짜"   onfocus="(this.type='date')" onblur="(this.type='text')">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>졸업날짜</td>
+                                        <td>
+                                            <input type="text"   id="update_education_end_date"   name="end_date"   class="form-control education" placeholder="졸업날짜"   onfocus="(this.type='date')" onblur="(this.type='text')" >
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 교육사항 -->
+                        <form name="edumatterupdateForm" method="post">
+                            <input type="hidden"            name="info_id" th:value="${detailset.id}">
+                            <input type="hidden"            id="update_matter_id"                   name="id">
+                            <table border="0" class="addTable edumatter">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>과정명</td>
+                                        <td>
+                                            <input type="text"              id="update_edumatter_course_name"       name="course_name"          class="form-control edumatter" placeholder="과정명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>학원</td>
+                                        <td>
+                                            <select name="institute_mc"     id="update_edumatter_institaion_mc"     class ="form-select edumatter">
+                                                <option value="">학원 선택</option>
+                                                <option th:each="institation : ${institute}" th:value="${institation.institute_mc}">[[${institation.name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>수료번호</td>
+                                        <td>
+                                            <input type="text"              id="update_edumatter_completion_number" name="completion_number"    class="form-control edumatter" placeholder="수료번호">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>시작일</td>
+                                        <td>
+                                            <input type="text" id="update_edumatter_start_date" name="start_date"   onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control edumatter" placeholder="시작일">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>수료일</td>
+                                        <td>
+                                            <input type="text" id="update_edumatter_end_date"   name="end_date"     onfocus="(this.type='date')" onblur="(this.type='text')" class="form-control edumatter" placeholder="수료일">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 자격증 -->
+                        <form name="qualificationsupdateForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <input type="hidden"    id="update_qualifi_ID"      name="id">
+                            <table border="0" class="addTable qualifications">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>자격증명</td>
+                                        <td>
+                                            <select name="qualifi_mc" id="update_qualifi_mc" class ="form-select qualifications">
+                                                <option value="">자격증 선택</option>
+                                                <option th:each="qualifi : ${qualifi}" th:value="${qualifi.qualifi_mc}">[[${qualifi.qualifi_name}]]</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>발급번호</td>
+                                        <td>
+                                            <input type="text"      id="update_qualifi_reg_num" name="reg_num"  class="form-control qualifications" placeholder="발급번호">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>취득일</td>
+                                        <td>
+                                            <input type="text"      id="update_qualfi_reg_date" name="reg_date" class="form-control qualifications" placeholder="취득일"    onfocus="(this.type='date')" onblur="(this.type='text')" >
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- 상훈 -->
+                        <form name="prizeupdateForm" method="post">
+                            <input type="hidden"  name="info_id" th:value="${detailset.id}">
+                            <input type="hidden"    id="update_prize_id"        name="id">
+                            <table border="0" class="addTable prize">
+                                <colgroup>
+                                    <col width="20%"/>
+                                    <col width="80%"/>
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>상훈명</td>
+                                        <td>
+                                            <input type="text"      id="update_prize_name"      name="name"         class="form-control prize"  placeholder="상훈명">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>상훈기관</td>
+                                        <td>
+                                            <input type="text"      id="update_prize_agency"    name="agency"       class="form-control prize"  placeholder="상훈기관">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>근거</td>
+                                        <td>
+                                            <input type="text"      id="update_prize_evidence"  name="evidence"     class="form-control prize"  placeholder="근거">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>연 월 일</td>
+                                        <td>
+                                            <input type="text"      id="update_prize_reg_date"  name="reg_date"     class="form-control prize"  placeholder="연 월 일"  onfocus="(this.type='date')" onblur="(this.type='text')">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="detail-update-btn" onclick="careerUpdate()">수정</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

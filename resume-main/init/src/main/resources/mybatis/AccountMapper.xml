@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.resume.init.Mapper.AccountMapper">
+
+	<select id="readAccount"  parameterType="String" resultType="com.resume.init.domain.Account">
+    <![CDATA[
+		SELECT * FROM resume.resume_member
+		WHERE ID= #{id}
+    ]]>
+	</select>
+	
+	<select id="readAuthorites"  parameterType="String" resultType="String">
+    <![CDATA[	
+        SELECT AUTHORITYNAME 
+		FROM resume.resume_AUTHORITY WHERE username=#{username}
+    ]]>
+	</select>
+
+	<insert id="insertUser" parameterType="com.resume.init.domain.Account">
+    <![CDATA[	
+        INSERT resume.resume_Member
+		(id,"password",isAccountNonExpired,isAccountNonLocked,isCredentialsNonExpired,isEnabled)
+		VALUES (
+		#{id},
+		#{password},
+		#{isAccountNonExpired},
+		#{isAccountNonLocked},
+		#{isCredentialsNonExpired},
+		#{isEnabled}
+		)
+    ]]>
+	</insert>
+
+	<insert id="insertUserAuthority" parameterType="com.resume.init.domain.Authority">
+    <![CDATA[
+		INSERT INTO resume.resume_AUTHORITY
+		(username,authorityName)
+		VALUES (
+		#{username},
+		#{authorityName}
+		)
+    ]]>
+	</insert>
+	
+	
+
+</mapper>

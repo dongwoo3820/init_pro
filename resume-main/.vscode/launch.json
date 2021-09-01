@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-InitApplication<init>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.resume.init.InitApplication",
+            "projectName": "init",
+            "args": ""
+        }
+    ]
+}

@@ -1,0 +1,188 @@
+
+<?xml-model href="file.dtd" type="application/xml-dtd"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resume.init.Mapper.UserMapper">
+
+    <resultMap id="userExtResult"  type="UserExt">
+
+        <result property="info_id"      column="info_id"/>
+        <result property="name"         column="name"/>
+        <result property="phone"        column="phone"/>
+        <result property="email"        column="email"/>
+        <result property="birth"        column="birth"/>
+        <result property="id"           column="id"/>
+        <result property="month"        column="month"/>
+        <result property="area"         column="area"/>
+        <result property="reg_date"     column="reg_date"/>
+        <result property="rnum"         column="rnum"/>
+        <result property="totcnt"       column="totcnt"/>
+        
+    </resultMap>
+    
+    <select id="getAllUser"  parameterType="hashMap"   resultType="com.resume.init.domain.UserExt">
+    <![CDATA[
+    select *
+    from (
+  		  select * ,(ROW_NUMBER() OVER()) AS RNUM, COUNT(*) OVER() AS totcnt
+        from (
+          select p.del_yn ,p.id ,p.name ,p.phone ,p.email,  ARRAY_TO_STRING( ARRAY_AGG(distinct ra.name),',') as area,ARRAY_TO_STRING(ARRAY_AGG(distinct qc.qualifi_name),',') as qualifi,ARRAY_TO_STRING( ARRAY_AGG(distinct ra.id),',') as area_id , i.imgname,
+          concat((greatest(max(c.end_date) ,max(w.end_date)) - least(min(c.start_date) , min(w.start_date)))/365, '년',
+          (greatest(max(c.end_date) ,max(w.end_date)) - least(min(c.start_date) , min(w.start_date)))%365/30 ,'개월') as career_age,
+          extract(year from age(now()::date, p.birth)) as age,
+          (greatest(max(c.end_date) ,max(w.end_date)) - least(min(c.start_date) , min(w.start_date)))/365 as cyear
+          from  resume.resume_img i , resume.resume_work_expertentce w , resume.resume_career_detail c ,resume.resume_personal_info p left join resume.resume_qualifications q on p.id = q.info_id left join resume.resume_qualification_code qc on q.qualifi_mc = qc.qualifi_mc,resume.resume_work_area wa ,resume.resume_area ra 
+          where p.id = c.info_id and p.id = w.info_id and c.info_id = w.info_id and ra.id = wa.area_id and p.id = wa.info_id and wa.area_yn = 'Y' and i.info_id = p.id  group by p.id, wa.info_id ,i.imgname
+            )a
+    ]]>
+    <where>
+      del_yn = 'N' 
+      <if test='search_yn == "Y"'>
+      and id in (
+          select p.id
+          from resume.resume_personal_info p ,resume.resume_work_area wa, resume.resume_work_expertentce w , resume.resume_career_detail c,resume.resume_qualifications q  
+          <where>
+            <if test='name != ""'>
+              <![CDATA[
+                and p.name like concat('%',#{name},'%') 
+              ]]>
+            </if>
+            <if test='career != ""'>
+              <![CDATA[
+              and ${career} <= cyear
+              ]]>
+            </if>
+            <if test='area != ""'>
+              and wa.area_yn = 'Y' and wa.info_id = p.id and (wa.area_id in (${area}))
+            </if>
+            <if test='qualifi != ""'>
+              and p.id = q.info_id and(q.qualifi_mc in (${qualifi}))
+            </if>
+            <if test='client_mc != ""'>
+              and p.id = c.info_id and (c.client_mc in (${client_mc}))
+            </if>
+            <if test='task_mc != ""'>
+              and p.id = wa.info_id and p.id = w.info_id  and p.id = c.info_id  and (c.task_mc in (${task_mc}) or w.task_mc in (${task_mc}))
+            </if>
+          </where>
+      )
+      </if>
+    </where>
+    <![CDATA[
+    )a
+    where RNUM BETWEEN 1 AND 10 ORDER BY id asc
+    ]]>
+    </select>
+
+      
+      <select id="selectInfoID" parameterType="hashMap"   resultType="com.resume.init.domain.UserExt">
+        <![CDATA[
+          SELECT max(id) as id
+          FROM resume.resume_personal_info
+        ]]>
+      </select>
+
+
+      <insert id="fileInsert" parameterType="com.resume.init.domain.FileAttach">
+        <![CDATA[
+        INSERT INTO resume.resume_file
+        (info_id, filename, fileoriginname,fileurl)
+        VALUES(
+          ${info_id},
+          #{filename},
+          #{fileoriginname},
+          #{fileurl}
+          )
+        ]]>
+      </insert>
+
+      <delete id="fileDelete" parameterType="hashMap">
+        <![CDATA[
+          DELETE 
+          FROM resume.resume_file 
+          where id = ${id}
+        ]]>
+      </delete>
+
+      <insert id="imgInsert" parameterType="com.resume.init.domain.ImageAttach">
+        <![CDATA[
+        INSERT INTO resume.resume_img
+        (info_id, imgname, imgoriginname, imgurl)
+        VALUES(
+          ${info_id},
+          #{imgname},
+          #{imgoriginname},
+          #{imgurl}
+          )
+        ]]>
+      </insert>
+
+      <delete id="imgDelete" parameterType="hashMap">
+        <![CDATA[
+          DELETE 
+          FROM resume.resume_img 
+          where info_id = ${info_id}
+        ]]>
+      </delete>
+
+
+    <insert id="saveUser" parameterType="hashMap">
+      <![CDATA[
+      INSERT INTO resume.resume_personal_info
+      (Name ,Phone ,Email ,birth ,address)
+      VALUES(
+        #{name}  
+        ,#{phone}
+        ,#{email}
+        ,TO_DATE(#{birth},  'YYYY-MM-DD')
+        ,#{address}
+        );
+      ]]>
+    </insert>
+
+    <update id="deleteUser" parameterType="hashMap">
+      <![CDATA[
+      UPDATE resume.resume_personal_info 
+      SET del_yn      = 'Y'
+      WHERE id = ${id}
+      ]]>
+    </update>
+
+    <update id="updateUser" parameterType="hashMap">
+      <![CDATA[
+        UPDATE resume.resume_personal_info 
+        SET name        = #{name}
+            ,phone      = #{phone}   
+            ,email      = #{email}
+            ,birth      = TO_DATE(#{birth},  'YYYY-MM-DD')
+            ,address    = #{address}
+            ,occupation = #{occupation}
+            ,task       = #{task}
+        WHERE id = ${info_id}
+      ]]>
+    </update>
+
+    <insert id="workAreaInsert" parameterType="hashMap">
+      <![CDATA[
+      INSERT INTO resume.resume_work_area 
+      (select p.id, a.id from resume.resume_area a, resume.resume_personal_info p where p.id = ${info_id} order by a.id);
+      ]]>
+    </insert>
+
+    <update id="workAreaUpdate" parameterType="hashMap">
+      <![CDATA[
+        UPDATE resume.resume_work_area
+        SET area_yn      = #{area_yn}
+        WHERE info_id = ${info_id} and area_id = ${area_id}
+      ]]>
+    </update>
+
+    <delete id="workAreaDelete" parameterType="hashMap">
+      <![CDATA[
+        DELETE 
+        FROM resume.resume_work_area
+        where info_id = ${info_id}
+      ]]>
+    </delete>
+</mapper>

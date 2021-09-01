@@ -1,0 +1,385 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="setting">
+<ul class="nav nav-pills m-3" id="pills-tab" role="tablist">
+    <!-- 고객사 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link active" id="pills-client-tab" data-bs-toggle="pill" data-bs-target="#pills-client" type="button" role="tab" aria-controls="pills-client" aria-selected="true">고객사</button>
+    </li>
+    <!-- 교육기관 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-institute-tab" data-bs-toggle="pill" data-bs-target="#pills-institute" type="button" role="tab" aria-controls="pills-institute" aria-selected="false">교육기관</button>
+    </li>
+    <!-- 직위 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-spot-tab" data-bs-toggle="pill" data-bs-target="#pills-spot" type="button" role="tab" aria-controls="pills-spot" aria-selected="false">직위</button>
+    </li>
+    <!-- 직종 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-occupation-tab" data-bs-toggle="pill" data-bs-target="#pills-occupation" type="button" role="tab" aria-controls="pills-occupation" aria-selected="false">직종</button>
+    </li> 
+    <!-- 직무 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-task-tab" data-bs-toggle="pill" data-bs-target="#pills-task" type="button" role="tab" aria-controls="pills-task" aria-selected="false">직무</button>
+    </li>   
+    <!-- 근무지역 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-area-tab" data-bs-toggle="pill" data-bs-target="#pills-area" type="button" role="tab" aria-controls="pills-area" aria-selected="false">근무지역</button>
+    </li>
+    <!-- 자격증 -->
+    <li class="nav-item1" role="presentation">
+        <button class="nav-link" id="pills-qualifi-tab" data-bs-toggle="pill" data-bs-target="#pills-qualifi" type="button" role="tab" aria-controls="pills-qualifi" aria-selected="false">자격증</button>
+    </li>
+</ul>
+<div class="tab-content m-3" id="pills-tabContent">
+    <!-- 고객사 -->
+    <div class="tab-pane fade show active" id="pills-client" role="tabpanel" aria-labelledby="pills-client-tab">
+        <table id="clientList"></table>
+        <div id="clientListPager"></div>
+    </div>
+    <!-- 교육기관 -->
+    <div class="tab-pane fade" id="pills-institute" role="tabpanel" aria-labelledby="pills-institute-tab">
+        <table id="instituteList"></table>
+        <div id="instituteListPager"></div>
+    </div>
+    <!-- 직위 -->
+    <div class="tab-pane fade" id="pills-spot" role="tabpanel" aria-labelledby="pills-spot-tab">
+        <table id="spotList"></table>
+        <div id="spotListPager"></div>
+    </div>
+    <!-- 직종 -->
+    <div class="tab-pane fade" id="pills-occupation" role="tabpanel" aria-labelledby="pills-occupation-tab">
+        <table id="occupationList"></table>
+        <div id="occupationListPager"></div>
+    </div>
+    <!-- 직무 -->
+    <div class="tab-pane fade" id="pills-task" role="tabpanel" aria-labelledby="pills-task-tab">
+        <table id="taskList"></table>
+        <div id="taskListPager"></div>
+    </div>
+    <!-- 근무지역 -->
+    <div class="tab-pane fade" id="pills-area" role="tabpanel" aria-labelledby="pills-area-tab">
+        <table id="areaList"></table>
+        <div id="areaListPager"></div>
+    </div>
+    <!-- 자격증 -->
+    <div class="tab-pane fade" id="pills-qualifi" role="tabpanel" aria-labelledby="pills-qualifi-tab">
+        <table id="qualifiList"></table>
+        <div id="qualifiListPager"></div>
+    </div>
+</div>  
+
+
+<!-- 추가 모달 -->
+<div class="modal fade" id="addSetting" tabindex="-1" aria-labelledby="addSettingLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body">
+                    <!-- 고객사 -->
+                    <form name="clientForm" method="post">
+                    <table border="0" class="addTable client">
+                        <colgroup>
+                            <col width="20%"/>
+                            <col width="80%"/>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td>고객사</td>
+                                <td>
+                                    <input type="text" id="client_name" name="name" class="form-control client" placeholder="고객사">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </form>
+                    <!-- 교육기관 -->
+                    <form name="instituteForm" method="post">
+                        <table border="0" class="addTable institute">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>교육기관명</td>
+                                    <td>
+                                        <input type="text" id="institute_name" name="name" class="form-control institute" placeholder="교육기관명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직위 -->
+                    <form name="spotForm" method="post">
+                        <table border="0" class="addTable spot">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직위명</td>
+                                    <td>
+                                        <input type="text" id="spot_name" name="name" class="form-control spot" placeholder="직위명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직종 -->
+                    <form name="occupationForm" method="post">
+                        <table border="0" class="addTable occupation">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직종명</td>
+                                    <td>
+                                        <input type="text" id="occupation_name" name="name" class="form-control occupation" placeholder="직종명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직무 -->
+                    <form name="taskForm" method="post">
+                        <table border="0" class="addTable task">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직종명</td>
+                                    <td>
+                                        <select name="occupation" id="upper_task_mc" class ="form-select task">
+                                            <option value="">직종 선택</option>
+                                            <option th:each="occupation : ${occupation}" th:value="${occupation.occupation_nm}">[[${occupation.name}]]</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>직무명</td>
+                                    <td>
+                                        <input type="text" id="task_name" name="name" class="form-control task" placeholder="직무명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 근무지역 -->
+                    <form name="areaForm" method="post">
+                        <table border="0" class="addTable area">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>근무지역</td>
+                                    <td>
+                                        <input type="text" id="area_name" name="name" class="form-control area" placeholder="근무지역명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 자격증 -->
+                    <form name="qualifiForm" method="post">
+                        <table border="0" class="addTable qualifi">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>자격증명</td>
+                                    <td>
+                                        <input type="text" id="qualifi_name" name="qualifi_name" class="form-control qualifi" placeholder="자격증명">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>발행기관</td>
+                                    <td>
+                                        <input type="text" id="qualifi_issuer" name="issuer" class="form-control qualifi" placeholder="발행기관">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="option-save-btn">저장</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 수정 모달 -->
+<div class="modal fade" id="updateSetting" tabindex="-1" aria-labelledby="updateSettingLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body">
+                    <!-- 고객사 -->
+                    <form name="clientUpdateForm" method="post">
+                        <input type="hidden" id="update_client_mc" name="client_mc">
+                        <table border="0" class="addTable client">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>고객사</td>
+                                    <td>
+                                        <input type="text" id="update_client_name" name="name" class="form-control client" placeholder="고객사">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 교육기관 -->
+                    <form name="instituteUpdateForm" method="post">
+                        <input type="hidden" id="update_institute_mc" name="institute_mc">
+                        <table border="0" class="addTable institute">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>교육기관명</td>
+                                    <td>
+                                        <input type="text" id="update_institute_name" name="name" class="form-control institute" placeholder="교육기관명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직위 -->
+                    <form name="spotUpdateForm" method="post">
+                        <input type="hidden" id="update_spot_mc" name="spot_mc">
+                        <table border="0" class="addTable spot">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직위명</td>
+                                    <td>
+                                        <input type="text" id="update_spot_name" name="name" class="form-control spot" placeholder="직위명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직종 -->
+                    <form name="occupationUpdateForm" method="post">
+                        <input type="hidden" id="update_occupation_nm" name="occupation_nm">
+                        <table border="0" class="addTable occupation">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직종명</td>
+                                    <td>
+                                        <input type="text" id="update_occupation_name" name="name" class="form-control occupation" placeholder="직종명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 직무 -->
+                    <form name="taskUpdateForm" method="post">
+                        <input type="hidden" id="update_task_nm" name="task_nm">
+                        <table border="0" class="addTable task">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>직종명</td>
+                                    <td>
+                                        <select name="occupation" id="update_occupation" class ="form-select task">
+                                            <option value="">직종 선택</option>
+                                            <option th:each="occupation : ${occupation}" th:value="${occupation.occupation_nm}">[[${occupation.name}]]</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>직무명</td>
+                                    <td>
+                                        <input type="text" id="update_task_name" name="name" class="form-control task" placeholder="직무명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 근무지역 -->
+                    <form name="areaUpdateForm" method="post">
+                        <input type="hidden" id="update_id" name="id">
+                        <table border="0" class="addTable area">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>지역명</td>
+                                    <td>
+                                        <input type="text" id="update_area_name" name="name" class="form-control area" placeholder="근무지역명">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    <!-- 자격증 -->
+                    <form name="qualifiUpdateForm" method="post">
+                        <input type="hidden" id="update_qualifi_mc" name="qualifi_mc">
+                        <table border="0" class="addTable qualifi">
+                            <colgroup>
+                                <col width="20%"/>
+                                <col width="80%"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <td>자격증명</td>
+                                    <td>
+                                        <input type="text" id="update_qualifi_name" name="qualifi_name" class="form-control qualifi" placeholder="자격증명">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>발급기관</td>
+                                    <td>
+                                        <input type="text" id="update_qualifi_issuer" name="issuer" class="form-control qualifi" placeholder="발급기관">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="option-update-btn">수정</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</html>

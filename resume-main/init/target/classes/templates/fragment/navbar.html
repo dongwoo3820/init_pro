@@ -1,0 +1,30 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="navigation">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark"> 
+        
+        <a class="navbar-brand m-2" href="/">홈</a> 
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar"> 
+            <span class="navbar-toggler-icon"></span> 
+        </button> 
+        <div class="collapse navbar-collapse" id="collapsibleNavbar"> 
+
+            <ul class="navbar-nav navbar-dark"> 
+                <li class="nav-item active"> 
+                    <a class="nav-link" href="javascript:setting_open()">설정</a> 
+                </li>
+            </ul>   
+        </div>
+        <th:block sec:authorize="!isAuthenticated()">
+            <button type="button" class="btn btn-primary float-rignt m-2" onClick="location.href='/login';">로그인</button> 
+        </th:block>
+        <th:block sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="btn btn-primary float-rignt m-2">로그아웃</button> 
+            </form>
+        </th:block>
+    </nav>
+</div>
+
+</html>

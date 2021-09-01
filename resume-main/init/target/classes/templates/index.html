@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>외주인력관리시스템</title>
+    
+    <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.12.1.custom/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/jqGrid/css/ui.jqgrid.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous"><link rel="stylesheet" type="text/css" media="screen" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/detail.css"/>
+    
+    <script src="/js/jquery-3.6.0.min.js" type="text/javascript"></script>
+    <script src="/js/main-index.js" type="text/javascript"></script>
+    <script src="/js/detail.js" type="text/javascript"></script>
+    <script src="/js/setting.js" type="text/javascript"></script> 
+    <!-- <script src="/jquery-ui-1.12.1.custom/jquery-ui.min.js" type="text/javascript"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script><script src="/jqGrid/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="/jqGrid/js/i18n/grid.locale-kr.js" type="text/javascript"></script>
+    <script src="/jqGrid/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+</head>
+<body>
+
+    <th:block th:replace="fragment/navbar :: navigation" th:remove="tag"></th:block>
+    <form id="search_form" name="search_form" method="POST">
+        <div style = "margin-top : 20px; margin-left : 15px; margin-right: 15px; font-size : 12px;">
+          <button type="button" class="btn btn-primary" id="add-btn">추가</button>
+
+          <!-- 검색 -->
+          <img >
+          <button type="button" class = "btn btn-info btn-fill" id ="search" onclick="searchForm()" style = "width : 6%; float : right; margin-left : 10px;">
+            검색창 ▼
+          </button>
+          <table class="searchTable" border="0" bgcolor="#D8D8D8">
+            <colgroup>
+              <col width="20%"/>
+              <col width="80%"/>
+            </colgroup>
+            <tbody>
+              <tr>
+                <td class="searchTitle">이름</td>
+                <td><input class="form-control" type="text" placeholder="이름" name="nameSearch"></td>
+              </tr>
+              <tr>
+                <td class="searchTitle">자격증</td>
+                <td>
+                  <th:block th:each="qualifi : ${qualifi}">
+                    <input type="checkbox" th:value="${qualifi.qualifi_mc}" th:id="|qualifi${qualifi.qualifi_mc}|" name="qualifi[]" class="qualifiCheckBox form-check-input">
+                    <label class="form-check-label" th:for="|qualifi${qualifi.qualifi_mc}|">[[${qualifi.qualifi_name}]]</label>
+                  </th:block>
+                </td>
+              </tr>
+              <tr>
+                <td class="searchTitle">경력</td>
+                <td>
+                  <input type="radio" name="careerRadio" id="career0" class="form-check-input" value="" checked><label class="form-check-label" for="career0">상관없음</label>
+                  <input type="radio" name="careerRadio" id="career1" class="form-check-input" value="1"><label class="form-check-label" for="career1">1년 이상</label>
+                  <input type="radio" name="careerRadio" id="career3" class="form-check-input" value="3"><label class="form-check-label" for="career3">3년 이상</label>
+                  <input type="radio" name="careerRadio" id="career5" class="form-check-input" value="5"><label class="form-check-label" for="career5">5년 이상</label>
+                </td>
+              </tr>
+              <tr>
+                <td class="searchTitle">근무가능지역</td>
+                <td>
+                  <th:block th:each="area : ${area}">
+                    <input type="checkbox" th:value="${area.id}" th:id="|area${area.id}|" name="area[]" class="areaCheckBox form-check-input">
+                    <label class="form-check-label" th:for="|area${area.id}|">[[${area.name}]]</label>
+                  </th:block>
+                </td>
+              </tr>
+              <tr>
+                <td class="searchTitle">고객사</td>
+                <td>
+                  <th:block th:each="client : ${client}">
+                    <input type="checkbox" th:value="${client.client_mc}" th:id="|client${client.client_mc}|" name="client[]" class="clientCheckBox form-check-input">
+                    <label class="form-check-label" th:for="|client${client.client_mc}|">[[${client.name}]]</label>
+                  </th:block>
+                </td>
+              </tr>
+              <tr>
+                <td class="searchTitle">주요업무</td>
+                <td>
+                  <th:block th:each="task : ${task}">
+                    <input type="checkbox" th:value="${task.task_nm}" th:id="|task${task.task_nm}|" name="task[]" class="taskCheckBox form-check-input">
+                    <label class="form-check-label" th:for="|task${task.task_nm}|">[[${task.name}]]</label>
+                  </th:block>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td class="searchButtonSet">
+                  <button type="button" class="btn btn-primary" onclick="searchUser()">검색</button>
+                  <button type="button" class="btn btn-danger" onclick="searchReset()">리셋</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </form>
+
+    <!-- jqGrid -->
+    <div class="grid-container" style="margin-top: 25px; padding: 15px;">
+      <table id="userList"></table>
+      <div id="userListpager"></div>
+    </div>
+    <!-- 넘겨주는 값 저장하는 장소 -->
+    <input type="hidden" id="param" name="param" value="data_1"/>
+
+
+    <!-- 상세페이지 모달 -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="detailModalLabel"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div id="detail"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="update-btn" onClick="userUpdate()">저장</button>
+              <button type="button" class="btn btn-primary" id="detail-add-btn">추가</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- 추가 모달 -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="addModalLabel">추가</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+        <form name="addForm" method="post">
+          <div class="modal-body">
+            <table class="detailTable" border="0">
+              <colgroup>
+                  <col width="30%"/>
+                  <col width="70%"/>
+              </colgroup>
+              <tbody>
+                  <tr>
+                      <td>이름</td>
+                      <td><input type="text"    id="info_name"      name="name"     class="form-control" placeholder="이름"></td>
+                  </tr>
+                  <tr>
+                      <td>생년월일</td>
+                      <td><input type="date"    id="info_birth"     name="birth"    class="form-control" placeholder="생년월일" onfocus="(this.type='date')" onblur="(this.type='text')"></td>
+                  </tr>   
+                  <tr>
+                      <td>휴대폰</td>
+                      <td><input type="tel"     id="info_phone"     name="phone"    class="form-control" placeholder="휴대폰"></td>
+                  </tr>
+                  <tr>
+                      <td>이메일</td>
+                      <td><input type="email"   id="info_email"     name="email"    class="form-control" placeholder="이메일"></td>
+                  </tr>
+                  <tr>
+                    <td>주소</td>
+                    <td><input type="text"   id="info_address"     name="address"    class="form-control" placeholder="주소"></td>
+                </tr>
+                  <tr>
+                    <td>근무가능지역</td>
+                    <td>
+                        <div class="form-check form-check-inline" th:each="area : ${area}">
+                            <input class="form-check-input" type="checkbox" th:name="area" th:id="|workAreaCheckbox${area.id}|" th:value="${area.id}">
+                            <label class="form-check-label" th:for="|workAreaCheckbox${area.id}|">[[${area.name}]]</label>
+                        </div>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" id="user-add-btn" onClick="userAdd()">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 설정 모달 -->
+    <div class="modal fade" id="optionModal" aria-labelledby="optionModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="optionModalLabel">설정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <th:block th:replace="setting :: setting" th:remove="tag"></th:block>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="option-add-btn">추가</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            
+          </div>
+        </div>
+      </div>
+  </div>
+
+</body>
+</html>
